@@ -1,3 +1,4 @@
+// psutil-go is a lightweight library in Go that provides essential system information
 package psutil
 
 import (
@@ -7,6 +8,7 @@ import (
 	"strings"
 )
 
+// CPUInfo represents CPU information struct from /proc/cpuinfo
 type CPUInfo struct {
 	coresNumber string
 	vendor      string
@@ -15,27 +17,33 @@ type CPUInfo struct {
 	cpuMHZ      string
 }
 
+// MemoryInfo represents Memory information struct from /proc/meminfo
 type MemoryInfo struct {
 	totalMemory     int
 	usedMemory      int
 	availableMemory int
 }
 
+// ProcessDetails represents Process information struct
 type ProcessDetails struct {
 	pid         string
 	processName string
 }
 
+// ProcessInfo represents Process information struct
 type ProcessInfo struct {
 	runningProcesses []ProcessDetails
 }
 
+// PSUtil represents psutil that contains CPUInfo, MemoryInfo and ProcessInfo
 type PSUtil struct {
 	CPUInfo     CPUInfo
 	MemoryInfo  MemoryInfo
 	ProcessInfo ProcessInfo
 }
 
+// NewPSUtil creates a new PSUtil instance
+// it loads CPUInfo, MemoryInfo and ProcessInfo from /proc and /proc/meminfo files
 func (p *PSUtil) NewPSUtil() error {
 	cpudata, err := os.ReadFile("/proc/cpuinfo")
 	if err != nil {
@@ -129,37 +137,47 @@ func (p *PSUtil) NewPSUtil() error {
 
 }
 
+// CPUCoresNum returns CPU cores number
 func (p *PSUtil) CPUCoresNum() string {
 	return p.CPUInfo.coresNumber
 }
 
+// CPUvendor returns CPU vendor name
 func (p *PSUtil) CPUvendor() string {
 	return p.CPUInfo.vendor
 }
 
+// CPUModel returns CPU model
 func (p *PSUtil) CPUModel() string {
 	return p.CPUInfo.modelName
 }
 
+// CPUcacheSize returns CPU cache size in KB
 func (p *PSUtil) CPUcacheSize() string {
 	return p.CPUInfo.cacheSize
 }
 
+// CPUMHZ returns CPU MHZ
 func (p *PSUtil) CPUMHZ() string {
 	return p.CPUInfo.cpuMHZ + " MHZ"
 }
 
+// AvailMem returns available memory in KB
 func (p *PSUtil) AvailMem() string {
 	return fmt.Sprintf("%d KB", p.MemoryInfo.availableMemory)
 }
 
+// TotalMem returns total memory in KB
 func (p *PSUtil) TotalMem() string {
 	return fmt.Sprintf("%d KB", p.MemoryInfo.totalMemory)
 }
+
+// UsedMem returns used memory in KB
 func (p *PSUtil) UsedMem() string {
 	return fmt.Sprintf("%d KB", p.MemoryInfo.usedMemory)
 }
 
+// RunningProcesses returns running processes PIDs and names
 func (p *PSUtil) RunningProcesses() []ProcessDetails {
 	return p.ProcessInfo.runningProcesses
 }
