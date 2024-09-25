@@ -42,7 +42,7 @@ func TestCPUInfo(t *testing.T) {
 	})
 
 	t.Run("test cpu model name", func(t *testing.T) {
-		model, err :=cpuModel(mockinfo)
+		model, err := cpuModel(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}

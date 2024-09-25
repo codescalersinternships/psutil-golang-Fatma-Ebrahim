@@ -154,7 +154,6 @@ type Info interface {
 	Getprocinfo() (ProcessInfo, error)
 }
 
-
 func cpuCoresNum(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
@@ -169,7 +168,6 @@ func CPUCoresNum() (string, error) {
 	return cpuCoresNum(filesinfo)
 }
 
-
 func cpuVendor(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
@@ -183,7 +181,6 @@ func CPUVendor() (string, error) {
 	filesinfo := &FilesInfo{}
 	return cpuVendor(filesinfo)
 }
-
 
 func cpuModel(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
@@ -206,12 +203,12 @@ func cpucacheSize(info Info) (string, error) {
 	}
 	return cpuinfo.CacheSize, nil
 }
+
 // CPUcacheSize returns CPU cache size in KB
 func CPUcacheSize() (string, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return cpucacheSize(fileinfo)
 }
-
 
 func cpuMHZ(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
@@ -223,10 +220,9 @@ func cpuMHZ(info Info) (string, error) {
 
 // CPUMHZ returns CPU MHZ
 func CPUMHZ() (string, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return cpuMHZ(fileinfo)
 }
-
 
 func availMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
@@ -238,10 +234,9 @@ func availMem(info Info) (string, error) {
 
 // AvailMem returns available memory in KB
 func AvailMem() (string, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return availMem(fileinfo)
 }
-
 
 func totalMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
@@ -253,10 +248,9 @@ func totalMem(info Info) (string, error) {
 
 // TotalMem returns total memory in KB
 func TotalMem() (string, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return totalMem(fileinfo)
 }
-
 
 func usedMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
@@ -268,10 +262,9 @@ func usedMem(info Info) (string, error) {
 
 // UsedMem returns used memory in KB
 func UsedMem() (string, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return usedMem(fileinfo)
 }
-
 
 func runningProcesses(info Info) ([]ProcessDetails, error) {
 	procinfo, err := info.Getprocinfo()
@@ -283,6 +276,6 @@ func runningProcesses(info Info) ([]ProcessDetails, error) {
 
 // RunningProcesses returns running processes PIDs and names
 func RunningProcesses() ([]ProcessDetails, error) {
-	fileinfo:=&FilesInfo{}
+	fileinfo := &FilesInfo{}
 	return runningProcesses(fileinfo)
 }
