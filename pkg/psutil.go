@@ -4,6 +4,7 @@ package psutil
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -41,17 +42,25 @@ func cpuinfo() (CPUInfo, error) {
 	if err != nil {
 		return cpuinfo, err
 	}
+	cpunum := runtime.NumCPU()
+	cpuinfo.CoresNumber = fmt.Sprintf("%d", cpunum)
 	cpulines := strings.Split(string(cpudata), "\n")
-	count := 5
+	count := 4 + cpunum
+	cpufreq := 0.0
+	cachesize := 0
+	cpucores := 0
 	for count > 0 && len(cpulines) > 0 {
 		line := cpulines[0]
 		cpulines = cpulines[1:]
 		switch {
+
 		case strings.HasPrefix(line, "cpu cores"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.CoresNumber = pair[1]
-
+			cpucores, err = strconv.Atoi(pair[1])
+			if err != nil {
+				return cpuinfo, err
+			}
 		case strings.HasPrefix(line, "vendor_id"):
 			count++
 			pair := strings.Split(line, ": ")
@@ -65,15 +74,26 @@ func cpuinfo() (CPUInfo, error) {
 		case strings.HasPrefix(line, "cache size"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.CacheSize = pair[1]
+			cachesize, err = strconv.Atoi(pair[1][:len(pair[1])-3])
+			if err != nil {
+				return cpuinfo, err
+			}
 
 		case strings.HasPrefix(line, "cpu MHz"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.CPUMHZ = pair[1]
+			corefreq, err := strconv.ParseFloat(pair[1], 64)
+			if err != nil {
+				return cpuinfo, err
+			}
+			cpufreq += corefreq
 		}
 
 	}
+	cpufreq /= float64(cpunum)
+	cpuinfo.CPUMHZ = fmt.Sprintf("%f", cpufreq)
+	cachesize *= cpucores
+	cpuinfo.CacheSize = fmt.Sprintf("%d", cachesize)
 	return cpuinfo, nil
 }
 func meminfo() (MemoryInfo, error) {
