@@ -10,90 +10,29 @@ import (
 
 // CPUInfo represents CPU information struct from /proc/cpuinfo
 type CPUInfo struct {
-	coresNumber string
-	vendor      string
-	modelName   string
-	cacheSize   string
-	cpuMHZ      string
+	CoresNumber string
+	Vendor      string
+	ModelName   string
+	CacheSize   string
+	CPUMHZ      string
 }
 
 // MemoryInfo represents Memory information struct from /proc/meminfo
 type MemoryInfo struct {
-	totalMemory     int
-	usedMemory      int
-	availableMemory int
+	TotalMemory     int
+	UsedMemory      int
+	AvailableMemory int
 }
 
 // ProcessDetails represents Process information struct
 type ProcessDetails struct {
-	pid         string
-	processName string
+	PID         string
+	ProcessName string
 }
 
 // ProcessInfo represents Process information struct
 type ProcessInfo struct {
-	runningProcesses []ProcessDetails
-}
-
-func procinfo() (ProcessInfo, error) {
-	procinfo := ProcessInfo{}
-	dir, err := os.Open("/proc")
-	if err != nil {
-		return procinfo, err
-	}
-	defer dir.Close()
-	pids, err := dir.Readdirnames(0)
-	if err != nil {
-		return procinfo, err
-	}
-	for _, pid := range pids {
-		if _, err := strconv.Atoi(pid); err == nil {
-			status, err := os.ReadFile(fmt.Sprintf("/proc/%s/status", pid))
-			if err == nil {
-				if strings.Contains(string(status), "State:\tR") {
-					nameline := strings.SplitN(string(status), "\n", 2)[0]
-					name := strings.Split(nameline, ":")[1]
-					procinfo.runningProcesses = append(procinfo.runningProcesses, ProcessDetails{
-						pid:         pid,
-						processName: strings.TrimSpace(strings.TrimSpace(name)),
-					})
-				}
-			}
-		}
-	}
-	return procinfo, nil
-
-}
-
-func meminfo() (MemoryInfo, error) {
-	meminfo := MemoryInfo{}
-	memdata, err := os.ReadFile("/proc/meminfo")
-	if err != nil {
-		return meminfo, err
-	}
-	memlines := strings.Split(string(memdata), "\n")
-	count := 2
-	for count > 0 && len(memlines) > 0 {
-		line := memlines[0]
-		memlines = memlines[1:]
-		switch {
-		case strings.HasPrefix(line, "MemTotal"):
-			count++
-			pair := strings.Split(line, ": ")
-			totalmem := pair[1][:len(pair[1])-3]
-			meminfo.totalMemory, _ = strconv.Atoi(strings.TrimSpace(totalmem))
-
-		case strings.HasPrefix(line, "MemAvailable"):
-			count++
-			pair := strings.Split(line, ": ")
-			availmem := pair[1][:len(pair[1])-3]
-			meminfo.availableMemory, _ = strconv.Atoi(strings.TrimSpace(availmem))
-
-		}
-	}
-	meminfo.usedMemory = meminfo.totalMemory - meminfo.availableMemory
-	return meminfo, nil
-
+	RunningProcesses []ProcessDetails
 }
 
 func cpuinfo() (CPUInfo, error) {
@@ -111,110 +50,187 @@ func cpuinfo() (CPUInfo, error) {
 		case strings.HasPrefix(line, "cpu cores"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.coresNumber = pair[1]
+			cpuinfo.CoresNumber = pair[1]
 
-		case strings.HasPrefix(line, "vendor_id"):
+		case strings.HasPrefix(line, "Vendor_id"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.vendor = pair[1]
+			cpuinfo.Vendor = pair[1]
 
 		case strings.HasPrefix(line, "model name"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.modelName = pair[1]
+			cpuinfo.ModelName = pair[1]
 
 		case strings.HasPrefix(line, "cache size"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.cacheSize = pair[1]
+			cpuinfo.CacheSize = pair[1]
 
 		case strings.HasPrefix(line, "cpu MHz"):
 			count++
 			pair := strings.Split(line, ": ")
-			cpuinfo.cpuMHZ = pair[1]
+			cpuinfo.CPUMHZ = pair[1]
 		}
 
 	}
 	return cpuinfo, nil
 }
-
-// CPUCoresNum returns CPU cores number
-func CPUCoresNum() (string, error) {
-	cpuinfo, err := cpuinfo()
+func meminfo() (MemoryInfo, error) {
+	meminfo := MemoryInfo{}
+	memdata, err := os.ReadFile("/proc/meminfo")
 	if err != nil {
-		return "", err
+		return meminfo, err
 	}
-	return cpuinfo.coresNumber, nil
+	memlines := strings.Split(string(memdata), "\n")
+	count := 2
+	for count > 0 && len(memlines) > 0 {
+		line := memlines[0]
+		memlines = memlines[1:]
+		switch {
+		case strings.HasPrefix(line, "MemTotal"):
+			count++
+			pair := strings.Split(line, ": ")
+			totalmem := pair[1][:len(pair[1])-3]
+			meminfo.TotalMemory, _ = strconv.Atoi(strings.TrimSpace(totalmem))
+
+		case strings.HasPrefix(line, "MemAvailable"):
+			count++
+			pair := strings.Split(line, ": ")
+			availmem := pair[1][:len(pair[1])-3]
+			meminfo.AvailableMemory, _ = strconv.Atoi(strings.TrimSpace(availmem))
+
+		}
+	}
+	meminfo.UsedMemory = meminfo.TotalMemory - meminfo.AvailableMemory
+	return meminfo, nil
+
+}
+func procinfo() (ProcessInfo, error) {
+	procinfo := ProcessInfo{}
+	dir, err := os.Open("/proc")
+	if err != nil {
+		return procinfo, err
+	}
+	defer dir.Close()
+	PIDs, err := dir.Readdirnames(0)
+	if err != nil {
+		return procinfo, err
+	}
+	for _, PID := range PIDs {
+		if _, err := strconv.Atoi(PID); err == nil {
+			status, err := os.ReadFile(fmt.Sprintf("/proc/%s/status", PID))
+			if err == nil {
+				if strings.Contains(string(status), "State:\tR") {
+					nameline := strings.SplitN(string(status), "\n", 2)[0]
+					name := strings.Split(nameline, ":")[1]
+					procinfo.RunningProcesses = append(procinfo.RunningProcesses, ProcessDetails{
+						PID:         PID,
+						ProcessName: strings.TrimSpace(strings.TrimSpace(name)),
+					})
+				}
+			}
+		}
+	}
+	return procinfo, nil
+
 }
 
-// CPUvendor returns CPU vendor name
-func CPUvendor() (string, error) {
-	cpuinfo, err := cpuinfo()
+type FilesInfo struct{}
+
+func (f *FilesInfo) Getcpuinfo() (CPUInfo, error) {
+	return cpuinfo()
+}
+func (f *FilesInfo) Getmeminfo() (MemoryInfo, error) {
+	return meminfo()
+}
+func (f *FilesInfo) Getprocinfo() (ProcessInfo, error) {
+	return procinfo()
+}
+
+type Info interface {
+	Getcpuinfo() (CPUInfo, error)
+	Getmeminfo() (MemoryInfo, error)
+	Getprocinfo() (ProcessInfo, error)
+}
+
+// CPUCoresNum returns CPU cores number
+func CPUCoresNum(info Info) (string, error) {
+	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
 	}
-	return cpuinfo.vendor, nil
+	return cpuinfo.CoresNumber, nil
+}
+
+// CPUVendor returns CPU Vendor name
+func CPUVendor(info Info) (string, error) {
+	cpuinfo, err := info.Getcpuinfo()
+	if err != nil {
+		return "", err
+	}
+	return cpuinfo.Vendor, nil
 }
 
 // CPUModel returns CPU model
-func CPUModel() (string, error) {
-	cpuinfo, err := cpuinfo()
+func CPUModel(info Info) (string, error) {
+	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
 	}
-	return cpuinfo.modelName, nil
+	return cpuinfo.ModelName, nil
 }
 
 // CPUcacheSize returns CPU cache size in KB
-func CPUcacheSize() (string, error) {
-	cpuinfo, err := cpuinfo()
+func CPUcacheSize(info Info) (string, error) {
+	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
 	}
-	return cpuinfo.cacheSize, nil
+	return cpuinfo.CacheSize, nil
 }
 
 // CPUMHZ returns CPU MHZ
-func CPUMHZ() (string, error) {
-	cpuinfo, err := cpuinfo()
+func CPUMHZ(info Info) (string, error) {
+	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
 	}
-	return cpuinfo.cpuMHZ + " MHZ", nil
+	return cpuinfo.CPUMHZ + " MHZ", nil
 }
 
 // AvailMem returns available memory in KB
-func AvailMem() (string, error) {
-	meminfo, err := meminfo()
+func AvailMem(info Info) (string, error) {
+	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%d KB", meminfo.availableMemory), nil
+	return fmt.Sprintf("%d KB", meminfo.AvailableMemory), nil
 }
 
 // TotalMem returns total memory in KB
-func TotalMem() (string, error) {
-	meminfo, err := meminfo()
+func TotalMem(info Info) (string, error) {
+	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%d KB", meminfo.totalMemory), nil
+	return fmt.Sprintf("%d KB", meminfo.TotalMemory), nil
 }
 
 // UsedMem returns used memory in KB
-func UsedMem() (string, error) {
-	meminfo, err := meminfo()
+func UsedMem(info Info) (string, error) {
+	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%d KB", meminfo.usedMemory), nil
+	return fmt.Sprintf("%d KB", meminfo.UsedMemory), nil
 }
 
 // RunningProcesses returns running processes PIDs and names
-func RunningProcesses() ([]ProcessDetails, error) {
-	procinfo, err := procinfo()
+func RunningProcesses(info Info) ([]ProcessDetails, error) {
+	procinfo, err := info.Getprocinfo()
 	if err != nil {
-		return procinfo.runningProcesses, err
+		return procinfo.RunningProcesses, err
 	}
-	return procinfo.runningProcesses, nil
+	return procinfo.RunningProcesses, nil
 }

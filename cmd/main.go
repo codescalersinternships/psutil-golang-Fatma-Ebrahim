@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	ps, err := psutil.RunningProcesses()
+	filesinfo := &psutil.FilesInfo{}
+	ps, err := psutil.RunningProcesses(filesinfo)
 	if err != nil {
 		log.Fatal(err)
 	}
