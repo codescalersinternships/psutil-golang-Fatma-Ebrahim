@@ -62,8 +62,7 @@ import (
 )
 
 func main() {
-	filesinfo := &psutil.FilesInfo{}
-	ps, err := psutil.RunningProcesses(filesinfo)
+	ps, err := psutil.RunningProcesses()
 	if err != nil {
 		log.Fatal(err)
 	}
