@@ -8,11 +8,10 @@ import (
 )
 
 func main() {
-	ps := &psutil.PSUtil{}
-	err := ps.NewPSUtil()
+	ps, err := psutil.RunningProcesses()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(ps.RunningProcesses())
+	fmt.Println(ps)
 
 }
