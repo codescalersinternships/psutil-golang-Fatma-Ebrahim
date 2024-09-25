@@ -52,7 +52,7 @@ func cpuinfo() (CPUInfo, error) {
 			pair := strings.Split(line, ": ")
 			cpuinfo.CoresNumber = pair[1]
 
-		case strings.HasPrefix(line, "Vendor_id"):
+		case strings.HasPrefix(line, "vendor_id"):
 			count++
 			pair := strings.Split(line, ": ")
 			cpuinfo.Vendor = pair[1]
@@ -154,8 +154,8 @@ type Info interface {
 	Getprocinfo() (ProcessInfo, error)
 }
 
-// CPUCoresNum returns CPU cores number
-func CPUCoresNum(info Info) (string, error) {
+
+func cpuCoresNum(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
@@ -163,8 +163,14 @@ func CPUCoresNum(info Info) (string, error) {
 	return cpuinfo.CoresNumber, nil
 }
 
-// CPUVendor returns CPU Vendor name
-func CPUVendor(info Info) (string, error) {
+// CPUCoresNum returns CPU cores number
+func CPUCoresNum() (string, error) {
+	filesinfo := &FilesInfo{}
+	return cpuCoresNum(filesinfo)
+}
+
+
+func cpuVendor(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
@@ -172,8 +178,14 @@ func CPUVendor(info Info) (string, error) {
 	return cpuinfo.Vendor, nil
 }
 
-// CPUModel returns CPU model
-func CPUModel(info Info) (string, error) {
+// CPUVendor returns CPU Vendor name
+func CPUVendor() (string, error) {
+	filesinfo := &FilesInfo{}
+	return cpuVendor(filesinfo)
+}
+
+
+func cpuModel(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
@@ -181,17 +193,27 @@ func CPUModel(info Info) (string, error) {
 	return cpuinfo.ModelName, nil
 }
 
-// CPUcacheSize returns CPU cache size in KB
-func CPUcacheSize(info Info) (string, error) {
+// CPUModel returns CPU model
+func CPUModel() (string, error) {
+	filesinfo := &FilesInfo{}
+	return cpuModel(filesinfo)
+}
+
+func cpucacheSize(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
 	}
 	return cpuinfo.CacheSize, nil
 }
+// CPUcacheSize returns CPU cache size in KB
+func CPUcacheSize() (string, error) {
+	fileinfo:=&FilesInfo{}
+	return cpucacheSize(fileinfo)
+}
 
-// CPUMHZ returns CPU MHZ
-func CPUMHZ(info Info) (string, error) {
+
+func cpuMHZ(info Info) (string, error) {
 	cpuinfo, err := info.Getcpuinfo()
 	if err != nil {
 		return "", err
@@ -199,8 +221,14 @@ func CPUMHZ(info Info) (string, error) {
 	return cpuinfo.CPUMHZ + " MHZ", nil
 }
 
-// AvailMem returns available memory in KB
-func AvailMem(info Info) (string, error) {
+// CPUMHZ returns CPU MHZ
+func CPUMHZ() (string, error) {
+	fileinfo:=&FilesInfo{}
+	return cpuMHZ(fileinfo)
+}
+
+
+func availMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
@@ -208,8 +236,14 @@ func AvailMem(info Info) (string, error) {
 	return fmt.Sprintf("%d KB", meminfo.AvailableMemory), nil
 }
 
-// TotalMem returns total memory in KB
-func TotalMem(info Info) (string, error) {
+// AvailMem returns available memory in KB
+func AvailMem() (string, error) {
+	fileinfo:=&FilesInfo{}
+	return availMem(fileinfo)
+}
+
+
+func totalMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
@@ -217,8 +251,14 @@ func TotalMem(info Info) (string, error) {
 	return fmt.Sprintf("%d KB", meminfo.TotalMemory), nil
 }
 
-// UsedMem returns used memory in KB
-func UsedMem(info Info) (string, error) {
+// TotalMem returns total memory in KB
+func TotalMem() (string, error) {
+	fileinfo:=&FilesInfo{}
+	return totalMem(fileinfo)
+}
+
+
+func usedMem(info Info) (string, error) {
 	meminfo, err := info.Getmeminfo()
 	if err != nil {
 		return "", err
@@ -226,11 +266,23 @@ func UsedMem(info Info) (string, error) {
 	return fmt.Sprintf("%d KB", meminfo.UsedMemory), nil
 }
 
-// RunningProcesses returns running processes PIDs and names
-func RunningProcesses(info Info) ([]ProcessDetails, error) {
+// UsedMem returns used memory in KB
+func UsedMem() (string, error) {
+	fileinfo:=&FilesInfo{}
+	return usedMem(fileinfo)
+}
+
+
+func runningProcesses(info Info) ([]ProcessDetails, error) {
 	procinfo, err := info.Getprocinfo()
 	if err != nil {
 		return procinfo.RunningProcesses, err
 	}
 	return procinfo.RunningProcesses, nil
+}
+
+// RunningProcesses returns running processes PIDs and names
+func RunningProcesses() ([]ProcessDetails, error) {
+	fileinfo:=&FilesInfo{}
+	return runningProcesses(fileinfo)
 }

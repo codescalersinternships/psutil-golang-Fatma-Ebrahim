@@ -1,22 +1,20 @@
-package test
+package psutil
 
 import (
 	"reflect"
 	"testing"
-
-	psutil "github.com/codescalersinternships/psutil-golang-Fatma-Ebrahim/pkg"
 )
 
-func (m *MockInfo) Getcpuinfo() (psutil.CPUInfo, error) {
-	cpuinfo := psutil.CPUInfo{CoresNumber: "2", Vendor: "vendor name", ModelName: "model name", CacheSize: "512 KB", CPUMHZ: "1000"}
+func (m *MockInfo) Getcpuinfo() (CPUInfo, error) {
+	cpuinfo := CPUInfo{CoresNumber: "2", Vendor: "vendor name", ModelName: "model name", CacheSize: "512 KB", CPUMHZ: "1000"}
 	return cpuinfo, nil
 }
-func (m *MockInfo) Getmeminfo() (psutil.MemoryInfo, error) {
-	meminfo := psutil.MemoryInfo{TotalMemory: 1024, AvailableMemory: 512, UsedMemory: 512}
+func (m *MockInfo) Getmeminfo() (MemoryInfo, error) {
+	meminfo := MemoryInfo{TotalMemory: 1024, AvailableMemory: 512, UsedMemory: 512}
 	return meminfo, nil
 }
-func (m *MockInfo) Getprocinfo() (psutil.ProcessInfo, error) {
-	procinfo := psutil.ProcessInfo{RunningProcesses: []psutil.ProcessDetails{{PID: "1", ProcessName: "main"}}}
+func (m *MockInfo) Getprocinfo() (ProcessInfo, error) {
+	procinfo := ProcessInfo{RunningProcesses: []ProcessDetails{{PID: "1", ProcessName: "main"}}}
 	return procinfo, nil
 }
 
@@ -25,7 +23,7 @@ type MockInfo struct{}
 func TestCPUInfo(t *testing.T) {
 	mockinfo := &MockInfo{}
 	t.Run("test cpu cores number", func(t *testing.T) {
-		coresnumber, err := psutil.CPUCoresNum(mockinfo)
+		coresnumber, err := cpuCoresNum(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -34,7 +32,7 @@ func TestCPUInfo(t *testing.T) {
 		}
 	})
 	t.Run("test cpu vendor", func(t *testing.T) {
-		vendor, err := psutil.CPUVendor(mockinfo)
+		vendor, err := cpuVendor(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -44,7 +42,7 @@ func TestCPUInfo(t *testing.T) {
 	})
 
 	t.Run("test cpu model name", func(t *testing.T) {
-		model, err := psutil.CPUModel(mockinfo)
+		model, err :=cpuModel(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -54,7 +52,7 @@ func TestCPUInfo(t *testing.T) {
 	})
 
 	t.Run("test cpu cache size", func(t *testing.T) {
-		cachesize, err := psutil.CPUcacheSize(mockinfo)
+		cachesize, err := cpucacheSize(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -64,7 +62,7 @@ func TestCPUInfo(t *testing.T) {
 	})
 
 	t.Run("test cpu MHZ", func(t *testing.T) {
-		cpumhz, err := psutil.CPUMHZ(mockinfo)
+		cpumhz, err := cpuMHZ(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -78,7 +76,7 @@ func TestCPUInfo(t *testing.T) {
 func TestMemInfo(t *testing.T) {
 	mockinfo := &MockInfo{}
 	t.Run("test total memory", func(t *testing.T) {
-		totalmem, err := psutil.TotalMem(mockinfo)
+		totalmem, err := totalMem(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -87,7 +85,7 @@ func TestMemInfo(t *testing.T) {
 		}
 	})
 	t.Run("test available memory", func(t *testing.T) {
-		availmem, err := psutil.AvailMem(mockinfo)
+		availmem, err := availMem(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -97,7 +95,7 @@ func TestMemInfo(t *testing.T) {
 	})
 
 	t.Run("test used memory", func(t *testing.T) {
-		usedmem, err := psutil.UsedMem(mockinfo)
+		usedmem, err := usedMem(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
@@ -110,11 +108,11 @@ func TestMemInfo(t *testing.T) {
 func TestProcInfo(t *testing.T) {
 	mockinfo := &MockInfo{}
 	t.Run("test running processes", func(t *testing.T) {
-		runproc, err := psutil.RunningProcesses(mockinfo)
+		runproc, err := runningProcesses(mockinfo)
 		if err != nil {
 			t.Errorf("expected nil got %v", err)
 		}
-		want := []psutil.ProcessDetails{{PID: "1", ProcessName: "main"}}
+		want := []ProcessDetails{{PID: "1", ProcessName: "main"}}
 		if !reflect.DeepEqual(runproc, want) {
 			t.Errorf("expected running processes: %v got %v", want, runproc)
 		}
